@@ -1,15 +1,16 @@
 @import "tailwindcss";
 
 @theme {
-  --color-paper: #f7f2e8;
-  --color-cream: #fcfaf5;
-  --color-ink: #16130f;
-  --color-ink-soft: #4a443c;
-  --color-clay: #b0502c;
-  --color-clay-deep: #8d3d20;
-  --color-sage: #6d7b60;
-  --color-sand: #e8dfcd;
-  --color-line: #ddd3c0;
+  --color-paper: #f6f3ec;
+  --color-cream: #fbf9f4;
+  --color-ink: #14201a;
+  --color-ink-soft: #4d574e;
+  --color-moss: #2f5d43;
+  --color-moss-deep: #234634;
+  --color-kraft: #b9863f;
+  --color-sage: #7d8f72;
+  --color-sand: #e9e3d6;
+  --color-line: #ddd7c8;
 
   --font-display: var(--font-fraunces), ui-serif, Georgia, serif;
   --font-sans: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
@@ -115,6 +116,15 @@ body {
 
 .group:hover .art-hover {
   transform: translateY(-6px) scale(1.035);
+}
+
+/* ---------- media hover ---------- */
+.img-zoom {
+  transition: transform 0.9s var(--ease-out-soft);
+}
+
+.group:hover .img-zoom {
+  transform: scale(1.045);
 }
 
 /* ---------- misc ---------- */

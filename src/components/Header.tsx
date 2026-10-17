@@ -3,17 +3,15 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
-import { useCart } from "./cart";
 
 const links = [
-  { href: "/shop", label: "Shop all" },
-  { href: "/shop?c=gift-sets", label: "Gift sets" },
-  { href: "/shop?c=home-scent", label: "Home & scent" },
-  { href: "/#story", label: "Our story" },
+  { href: "/products", label: "Products" },
+  { href: "/#factory", label: "Factory" },
+  { href: "/#about", label: "About" },
+  { href: "/contact", label: "Contact" },
 ];
 
 export default function Header() {
-  const { count, setOpen } = useCart();
   const [scrolled, setScrolled] = useState(false);
   const [menu, setMenu] = useState(false);
   const pathname = usePathname();
@@ -25,9 +23,7 @@ export default function Header() {
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
 
-  useEffect(() => {
-    setMenu(false);
-  }, [pathname]);
+  useEffect(() => setMenu(false), [pathname]);
 
   useEffect(() => {
     document.body.style.overflow = menu ? "hidden" : "";
@@ -38,17 +34,17 @@ export default function Header() {
 
   return (
     <header className="sticky top-0 z-40">
-      <div className="overflow-hidden bg-ink py-2 text-cream">
+      <div className="overflow-hidden bg-moss-deep py-2 text-cream">
         <div className="marquee-track flex w-max gap-10 whitespace-nowrap text-[10px] tracking-[0.24em] uppercase">
           {Array.from({ length: 2 }).map((_, i) => (
             <span key={i} className="flex gap-10">
-              <span>Complimentary shipping over $120</span>
+              <span>Custom eco bags, made in Shenzhen</span>
               <span aria-hidden>·</span>
-              <span>Hand-wrapped in the studio</span>
+              <span>FOB Ningbo · worldwide shipping</span>
               <span aria-hidden>·</span>
-              <span>Ships within 24 hours</span>
+              <span>Eight product lines, one factory</span>
               <span aria-hidden>·</span>
-              <span>30-day returns, no questions</span>
+              <span>Artwork files: JPG, PDF, AI, EPS</span>
               <span aria-hidden>·</span>
             </span>
           ))}
@@ -63,7 +59,6 @@ export default function Header() {
         }`}
       >
         <div className="mx-auto grid max-w-[1400px] grid-cols-[1fr_auto_1fr] items-center gap-4 px-5 py-4 sm:px-8">
-          {/* left */}
           <nav className="hidden items-center gap-7 text-[11px] tracking-[0.16em] uppercase lg:flex">
             {links.slice(0, 3).map((l) => (
               <Link key={l.href} href={l.href} className="underline-grow text-ink-soft hover:text-ink">
@@ -71,6 +66,7 @@ export default function Header() {
               </Link>
             ))}
           </nav>
+
           <button
             onClick={() => setMenu(true)}
             className="flex items-center gap-2 text-ink lg:hidden"
@@ -81,22 +77,20 @@ export default function Header() {
             </svg>
           </button>
 
-          {/* logo */}
           <Link href="/" className="justify-self-center text-center">
             <span className="display block text-[22px] leading-none tracking-[0.16em] sm:text-[26px]">
               MAXGIFT
             </span>
             <span className="mt-1 block text-[8px] tracking-[0.42em] uppercase text-ink-soft">
-              Considered gifting
+              Packaging since 2018
             </span>
           </Link>
 
-          {/* right */}
-          <div className="flex items-center justify-end gap-1 sm:gap-2">
+          <div className="flex items-center justify-end gap-2">
             <Link
-              href="/shop"
-              className="hidden rounded-full p-2.5 text-ink-soft transition hover:bg-sand/70 hover:text-ink sm:block"
-              aria-label="Search the shop"
+              href="/products"
+              className="hidden rounded-full p-2.5 text-ink-soft transition hover:bg-sand/70 hover:text-ink lg:block"
+              aria-label="Search products"
             >
               <svg width="17" height="17" viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth="1.4">
                 <circle cx="9" cy="9" r="5.5" />
@@ -104,31 +98,21 @@ export default function Header() {
               </svg>
             </Link>
             <Link
-              href="/#story"
-              className="hidden rounded-full p-2.5 text-ink-soft transition hover:bg-sand/70 hover:text-ink sm:block"
-              aria-label="About us"
+              href="/contact"
+              className="hidden items-center gap-2 rounded-full bg-ink px-5 py-2.5 text-[10px] tracking-[0.16em] uppercase text-cream transition hover:bg-moss sm:inline-flex"
             >
-              <svg width="17" height="17" viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth="1.4">
-                <circle cx="10" cy="7" r="3.2" />
-                <path d="M4 17c1.4-3.2 3.4-4.6 6-4.6s4.6 1.4 6 4.6" strokeLinecap="round" />
-              </svg>
+              Request a quote
             </Link>
-            <button
-              onClick={() => setOpen(true)}
-              className="group relative flex items-center gap-2 rounded-full px-2.5 py-2 text-ink-soft transition hover:bg-sand/70 hover:text-ink"
-              aria-label={`Open bag, ${count} items`}
+            <Link
+              href="/contact"
+              className="rounded-full border border-ink/20 px-4 py-2 text-[10px] tracking-[0.16em] uppercase sm:hidden"
             >
-              <svg width="17" height="17" viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth="1.4">
-                <path d="M4.5 6h11l-1 11h-9l-1-11Z" strokeLinejoin="round" />
-                <path d="M7.4 6V4.8a2.6 2.6 0 0 1 5.2 0V6" strokeLinecap="round" />
-              </svg>
-              <span className="text-[11px] tabular-nums">{count}</span>
-            </button>
+              Quote
+            </Link>
           </div>
         </div>
       </div>
 
-      {/* mobile menu */}
       <div
         className={`fixed inset-0 z-50 bg-paper transition-opacity duration-300 lg:hidden ${
           menu ? "opacity-100" : "pointer-events-none opacity-0"
@@ -143,21 +127,16 @@ export default function Header() {
           </button>
         </div>
         <nav className="flex flex-col gap-2 px-5 pt-6">
-          {[...links, { href: "/checkout", label: "Checkout" }].map((l, i) => (
-            <Link
-              key={l.href}
-              href={l.href}
-              className="display border-b border-line/70 py-4 text-3xl"
-              style={{ transitionDelay: `${i * 40}ms` }}
-            >
+          {[...links, { href: "/contact", label: "Request a quote" }].map((l) => (
+            <Link key={l.href + l.label} href={l.href} className="display border-b border-line/70 py-4 text-3xl">
               {l.label}
             </Link>
           ))}
         </nav>
         <p className="px-5 pt-8 text-xs leading-relaxed text-ink-soft">
-          Considered gifts, made in small batches and wrapped by hand in our studio.
+          Custom non-woven, woven, insulated, cotton and jute bags.
           <br />
-          hello@maxgift.co
+          sales@maxgiftpro.com
         </p>
       </div>
     </header>

@@ -1,24 +1,26 @@
-# Maxgift — 电商独立站
+# Maxgift — 定制环保袋制造商官网
 
-一个可以直接上线的高端礼品电商前端：首页、商品列表、商品详情、购物袋抽屉、结算页。
+深圳包装制造商的英文企业站：8 条产品线、真实规格参数、工厂实拍、客户证言、询盘表单。
 
 技术栈：**Next.js 16（App Router + Turbopack）· React 19 · TypeScript · Tailwind CSS v4**
+
+线上仓库：https://github.com/smileit/maxgiftdsh
 
 ---
 
 ## 本地运行
 
-项目里已经带了一套便携工具链（Git / Node / pnpm），先加载环境变量：
+项目带了一套便携工具链（Git / Node / pnpm），先加载环境：
 
 ```powershell
 Set-ExecutionPolicy -Scope Process -ExecutionPolicy Bypass -Force
-. .\.tools\env.ps1      # 在 my-site 目录下执行；在上一级执行也用这个路径
+. .\.tools\env.ps1
 ```
 
 然后：
 
 ```powershell
-pnpm install     # 首次
+pnpm install
 pnpm dev         # http://localhost:3000
 ```
 
@@ -29,8 +31,19 @@ pnpm build
 pnpm start
 ```
 
-> 注意：`next dev` / `next build` 会 fork 子进程，DSH 的默认沙箱禁止子进程使用命名管道，
-> 会报 `spawn EPERM`。在本项目里跑这两条命令需要临时放宽权限，或直接在你自己的终端里跑。
+> `next dev` / `next build` 会 fork 子进程，DSH 默认沙箱禁止子进程使用命名管道，会报
+> `spawn EPERM`。在本项目里跑这两条命令需要临时放宽权限，或在你自己的终端里跑。
+
+---
+
+## 页面
+
+| 路由 | 内容 |
+|---|---|
+| `/` | 首页：全屏 banner、品牌介绍、8 条产品线、四项能力、工厂、材质故事、客户类型、证言、询盘 CTA |
+| `/products` | 产品列表，按材质筛选（Non-woven / Woven / Insulated / Natural / Specialty） |
+| `/products/[slug]` | 产品详情：多图切换、完整规格表、介绍、询盘 CTA、相关产品 |
+| `/contact` | 询盘页：表单（姓名/公司/邮箱/数量/产品线/需求）+ 联系方式 + 工厂图 |
 
 ---
 
@@ -38,113 +51,94 @@ pnpm start
 
 ```
 my-site/
+├─ public/img/               从原站迁过来的真实素材（产品实拍、厂房、图标）
 ├─ src/
 │  ├─ app/
-│  │  ├─ layout.tsx          根布局：字体、SEO、购物车 Provider、页头页脚
+│  │  ├─ layout.tsx          根布局：字体、SEO、页头页脚
 │  │  ├─ page.tsx            首页
-│  │  ├─ globals.css         设计 token（配色、字体、动效）+ 自定义样式
-│  │  ├─ shop/
-│  │  │  ├─ page.tsx         列表页（服务端，读 ?c= 分类）
-│  │  │  └─ ShopClient.tsx   筛选 + 排序（客户端）
-│  │  ├─ product/[slug]/
-│  │  │  └─ page.tsx         详情页（静态生成 + SEO metadata）
-│  │  └─ checkout/page.tsx   结算页（演示，不收款）
+│  │  ├─ globals.css         设计 token + 自定义样式
+│  │  ├─ products/
+│  │  │  ├─ page.tsx         列表页（服务端，读 ?family=）
+│  │  │  ├─ ProductsClient.tsx  材质筛选（客户端）
+│  │  │  └─ [slug]/page.tsx  详情页（静态生成 + SEO）
+│  │  └─ contact/page.tsx    询盘页
 │  ├─ components/
-│  │  ├─ cart.tsx            购物车 Context + localStorage + 抽屉 + Toast
-│  │  ├─ Header.tsx          吸顶导航、跑马灯、移动端菜单
-│  │  ├─ ProductCard.tsx     商品卡（悬停 Quick add）
-│  │  ├─ ProductDetail.tsx   图库、规格、加购、手风琴
-│  │  ├─ ProductArt.tsx      8 个手绘 SVG 商品插画
-│  │  ├─ Reveal.tsx          滚动进场动画
-│  │  └─ Newsletter.tsx      订阅表单（含校验）
-│  └─ lib/products.ts        商品与分类数据（唯一内容源）
-├─ postcss.config.mjs        Tailwind v4 的 PostCSS 插件
+│  │  ├─ Header.tsx          吸顶导航 + 跑马灯 + 移动端菜单
+│  │  ├─ Footer.tsx          地址/电话/邮箱 + 产品与材质导航
+│  │  ├─ ProductCard.tsx     产品卡（悬停缩放 + View specs）
+│  │  ├─ ProductGallery.tsx  详情页图库
+│  │  ├─ InquiryForm.tsx     询盘表单（校验 + 生成邮件草稿）
+│  │  └─ Reveal.tsx          滚动进场动画
+│  └─ lib/catalog.ts         产品数据 + 公司信息（唯一内容源）
+├─ postcss.config.mjs        Tailwind v4 PostCSS 插件
 └─ next.config.ts
 ```
 
 ---
 
-## 设计语言
+## 改成别的内容
 
-| 项 | 取值 |
-|---|---|
-| 底色 `paper` | `#f7f2e8` 暖米白 |
-| 卡片色 `cream` | `#fcfaf5` |
-| 正文 `ink` | `#16130f` 近黑 |
-| 强调 `clay` | `#b0502c` 陶土红 |
-| 辅助 `sage` | `#6d7b60` 鼠尾草绿 |
-| 分割线 `line` | `#ddd3c0` |
-| 标题字体 | Fraunces（衬线，带 SOFT/WONK 轴） |
-| 正文字体 | Inter |
-| 圆角 | 2–3px，克制 |
-| 动效 | `cubic-bezier(0.22,1,0.36,1)`，0.5–0.9s |
-
-配色和字体都在 `src/app/globals.css` 的 `@theme` 里，改一处全站生效。
-
----
-
-## 换成你自己的内容
-
-**所有商品都在 [`src/lib/products.ts`](src/lib/products.ts)**，改这个文件就能换掉全站内容：
+全部集中在 [`src/lib/catalog.ts`](src/lib/catalog.ts)：
 
 | 字段 | 说明 |
 |---|---|
-| `slug` | URL，`/product/<slug>`，同时是购物车去重键 |
-| `name` / `tagline` / `description` | 商品名、一句话卖点、详情描述 |
-| `price` / `compareAt` | 现价、划线原价（可选） |
-| `category` | `gift-sets` / `home-scent` / `kitchen` / `desk` |
-| `details[]` | 详情页手风琴里的条目 |
-| `materials` / `colorway` | 材质、颜色名 |
-| `tint` / `ink` | 商品卡背景色、插画墨色（两个十六进制值） |
-| `art` | 插画类型：`box` `candle` `diffuser` `throw` `kettle` `cup` `lamp` `journal` |
-| `badge` | `Bestseller` / `New` / `Limited` |
+| `company` | 邮箱、电话、地址、贸易条款 |
+| `families` | 材质分类（筛选用） |
+| `products[].slug` | URL：`/products/<slug>` |
+| `products[].title` / `blurb` | 品名、一句话卖点 |
+| `products[].code` | 型号，如 `NWB-B24001` |
+| `products[].images` | `/img/xxx.jpg`，第一张作封面 |
+| `products[].intro` | 详情页正文段落数组 |
+| `products[].specs` | 规格表（标签/值数组，顺序即展示顺序） |
+| `products[].featured` | 是否进 `featured` 集合 |
 
-### 换成真实商品图
+### 换产品图
 
-现在用的是手绘 SVG 插画（`ProductArt.tsx`），不依赖任何外部图片。要换成实拍图：
-
-1. 把图片放进 `public/products/`
-2. 在 `ProductCard.tsx` 和 `ProductDetail.tsx` 里把 `<ProductArt />` 换成 `next/image` 的 `<Image />`
-3. 给 `Product` 类型加一个 `image: string` 字段
+把图片放进 `public/img/`，在 `images` 里写 `/img/文件名.jpg` 即可。`next/image` 会自动压缩成合适尺寸（实测 89 KB 原图 → 38 KB 优化版）。
 
 ---
 
-## 交互清单
+## 设计
 
-- 吸顶导航滚动后变毛玻璃，顶部信息跑马灯
-- 商品卡悬停：插画上浮放大 + Quick add 滑出 + Toast 提示
-- 购物袋抽屉：右侧滑入、数量步进、免运费进度条、本地持久化
-- 列表页：分类筛选 + 排序（价格/评分），筛选条吸顶
-- 详情页：三视图切换、数量步进、加购、手风琴展开
-- 全站滚动进场动画，`prefers-reduced-motion` 自动降级
+| 项 | 取值 |
+|---|---|
+| 底色 `paper` | `#f6f3ec` |
+| 深色 `ink` | `#14201a` 墨绿黑 |
+| 主色 `moss` | `#2f5d43` |
+| 强调 `kraft` | `#b9863f` 牛皮纸色 |
+| 辅助 `sage` | `#7d8f72` |
+| 标题 | Fraunces（衬线） |
+| 正文 | Inter |
+| 动效 | `cubic-bezier(0.22,1,0.36,1)` · 0.5–0.9s |
 
----
-
-## 上线到 Vercel
-
-1. 把代码推到 GitHub（见下方命令）
-2. 打开 https://vercel.com/new ，选这个仓库
-3. 框架自动识别为 Next.js，**不需要填环境变量**
-4. 点 Deploy，之后每次 `git push` 自动重新部署
+配色改 `src/app/globals.css` 的 `@theme`，一处生效全站。
 
 ---
 
-## 推到 GitHub
+## 交互
 
-```powershell
-git remote add origin git@github.com:<你的用户名>/maxgift.git
-git push -u origin main
-```
-
-首次使用需要先把公钥加到 GitHub：Settings → SSH and GPG keys → New SSH key。
+- 首页 banner 全屏 + 渐变遮罩，内容底部对齐
+- 顶部信息跑马灯，导航滚动后切毛玻璃
+- 产品卡悬停：图片缓慢放大 + "View specs" 从底部滑出
+- 列表页材质筛选条吸顶
+- 详情页多图切换（6 张缩略图）、规格表、相关产品
+- 询盘表单：必填校验、邮箱格式校验、提交后生成邮件草稿（`mailto:`）并给出成功态
+- 全站滚动进场动画，`prefers-reduced-motion` 自动关闭
 
 ---
 
-## 已知的环境限制（这台机器）
+## 部署到 Vercel
 
-- `winget` 在沙箱里不可用（命名管道受限），Git 是用便携版 MinGit 装的
-- PowerShell 的 HTTPS 请求会失败（.NET TLS 握手被挡），下载要走 Node
-- `pnpm` 的缓存/存储目录指向了工作区内，见根目录 `.npmrc`
-- pnpm 在 Windows 上的符号链接会栈溢出，所以用了 `nodeLinker: hoisted`
-- `@tailwindcss/turbopack` 这个 loader 会吞掉 globals.css 里的自定义规则，已换成
-  `@tailwindcss/postcss` + `postcss.config.mjs`
+1. https://vercel.com/new → 选 `smileit/maxgiftdsh`
+2. 自动识别 Next.js，**无需环境变量**
+3. Deploy，之后每次 `git push` 自动重新部署
+
+---
+
+## 已知环境限制
+
+- `winget` 在沙箱里不可用（命名管道受限），Git 用便携版 MinGit
+- PowerShell 的 HTTPS 请求会失败（.NET TLS 握手被挡），下载走 Node
+- pnpm 缓存在工作区内（根目录 `.npmrc`），并用 `nodeLinker: hoisted` 规避 Windows 符号链接栈溢出
+- `@tailwindcss/turbopack` 会吞掉 globals.css 自定义规则，已换成 `@tailwindcss/postcss`
+- `git push` 需要放宽权限，否则子进程管道失败
