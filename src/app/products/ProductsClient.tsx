@@ -1,13 +1,19 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import type { Family } from "@/lib/catalog";
 import { families, products } from "@/lib/catalog";
 import ProductCard from "@/components/ProductCard";
 import Reveal from "@/components/Reveal";
 
-export default function ProductsClient({ initialFamily }: { initialFamily?: Family }) {
-  const [family, setFamily] = useState<Family | "all">(initialFamily ?? "all");
+export default function ProductsClient() {
+  const [family, setFamily] = useState<Family | "all">("all");
+
+  // Read ?family= on the client so the route stays fully static.
+  useEffect(() => {
+    const value = new URLSearchParams(window.location.search).get("family");
+    if (value && families.some((f) => f.id === value)) setFamily(value as Family);
+  }, []);
 
   const list = useMemo(
     () => (family === "all" ? products : products.filter((p) => p.family === family)),
@@ -15,51 +21,41 @@ export default function ProductsClient({ initialFamily }: { initialFamily?: Fami
   );
 
   return (
-    <>
-      <section className="mx-auto max-w-[1400px] px-5 pt-12 sm:px-8">
-        <div className="flex flex-col gap-6 border-b border-line pb-10 lg:flex-row lg:items-end lg:justify-between">
-          <div>
-            <p className="eyebrow text-ink-soft">The catalogue</p>
-            <h1 className="display mt-4 text-[clamp(2.4rem,5vw,4rem)]">Custom bags, by material.</h1>
-            <p className="mt-4 max-w-xl text-sm leading-relaxed text-ink-soft">
-              Every line is built to your dimensions, colour and artwork. The specs below are the
+    <section className="band" style={{ paddingTop: 48 }}>
+      <div className="shell">
+        <div className="section-head">
+          <div className="section-head__text">
+            <p className="eyebrow">Catalogue</p>
+            <h1 className="display h2" style={{ marginTop: 14 }}>
+              All product lines
+            </h1>
+            <p>
+              Eight lines, each made to your size, colour and artwork. The specs below are the
               standard build — change anything.
             </p>
           </div>
-          <p className="text-[11px] tracking-[0.16em] uppercase text-ink-soft">
+          <p className="eyebrow eyebrow--plain">
             {list.length} {list.length === 1 ? "line" : "lines"}
           </p>
         </div>
 
-        <div className="sticky top-[104px] z-20 -mx-5 mt-6 border-b border-line/70 bg-paper/85 px-5 py-4 backdrop-blur-xl sm:-mx-8 sm:px-8">
-          <div className="no-scrollbar flex gap-2 overflow-x-auto">
+        <div className="chips" role="group" aria-label="Filter by material">
+          <button className="chip" aria-pressed={family === "all"} onClick={() => setFamily("all")}>
+            All
+          </button>
+          {families.map((f) => (
             <button
-              onClick={() => setFamily("all")}
-              className={`shrink-0 rounded-full border px-4 py-2 text-[11px] tracking-[0.12em] uppercase transition ${
-                family === "all"
-                  ? "border-ink bg-ink text-cream"
-                  : "border-line text-ink-soft hover:border-ink/40 hover:text-ink"
-              }`}
+              key={f.id}
+              className="chip"
+              aria-pressed={family === f.id}
+              onClick={() => setFamily(f.id)}
             >
-              All
+              {f.name}
             </button>
-            {families.map((f) => (
-              <button
-                key={f.id}
-                onClick={() => setFamily(f.id)}
-                className={`shrink-0 rounded-full border px-4 py-2 text-[11px] tracking-[0.12em] uppercase transition ${
-                  family === f.id
-                    ? "border-ink bg-ink text-cream"
-                    : "border-line text-ink-soft hover:border-ink/40 hover:text-ink"
-                }`}
-              >
-                {f.name}
-              </button>
-            ))}
-          </div>
+          ))}
         </div>
 
-        <div className="mt-10 grid grid-cols-2 gap-x-5 gap-y-14 lg:grid-cols-4">
+        <div className="grid-products" style={{ marginTop: 36 }}>
           {list.map((p, i) => (
             <Reveal key={p.slug} delay={(i % 4) * 60}>
               <ProductCard product={p} />
@@ -68,11 +64,32 @@ export default function ProductsClient({ initialFamily }: { initialFamily?: Fami
         </div>
 
         {list.length === 0 ? (
-          <p className="py-24 text-center text-sm text-ink-soft">
+          <p style={{ padding: "72px 0", textAlign: "center", color: "var(--color-ink-soft)" }}>
             Nothing in this material family yet — try another.
           </p>
         ) : null}
-      </section>
-    </>
+
+        <div
+          style={{
+            marginTop: 64,
+            paddingTop: 28,
+            borderTop: "1px solid var(--color-line)",
+            display: "flex",
+            flexWrap: "wrap",
+            alignItems: "center",
+            justifyContent: "space-between",
+            gap: 16,
+          }}
+        >
+          <p style={{ margin: 0, fontSize: 15, color: "var(--color-ink-soft)", maxWidth: "52ch" }}>
+            Not sure which material suits your product? Send the dimensions and what goes inside —
+            we will recommend the line and the print method.
+          </p>
+          <a href="/contact" className="btn btn--solid">
+            Ask for advice
+          </a>
+        </div>
+      </div>
+    </section>
   );
 }

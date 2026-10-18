@@ -263,3 +263,91 @@ export function getProduct(slug: string) {
 export function familyName(id: Family) {
   return families.find((f) => f.id === id)?.name ?? "";
 }
+
+export const customisation = [
+  { title: "Size", body: "Cut to your product's dimensions — no compromise to the nearest standard." },
+  { title: "Colour", body: "Pantone-matched body, handles and lining." },
+  { title: "Print", body: "Screen, heat transfer or laminated full colour." },
+  { title: "Handles", body: "Die-cut, webbing, rope or cotton tape." },
+  { title: "Packing", body: "Polybag, hangtag, header card or retail-ready carton." },
+];
+
+export const processSteps = [
+  {
+    step: "01",
+    title: "Artwork",
+    body: "Send JPG, PDF, AI or EPS. We check printability and flag anything that will muddy before it costs you a run.",
+  },
+  {
+    step: "02",
+    title: "Proof",
+    body: "A digital proof with material, size and colour confirmed — signed off before anything is cut.",
+  },
+  {
+    step: "03",
+    title: "Sample",
+    body: "A physical pre-production sample, so you approve the hand-feel rather than a screen.",
+  },
+  {
+    step: "04",
+    title: "Production",
+    body: "Cutting, printing, stitching and QC in one building. Progress photos on request.",
+  },
+  {
+    step: "05",
+    title: "Shipping",
+    body: "FOB Ningbo as standard, or hand over to your forwarder. Cartons labelled to your spec.",
+  },
+];
+
+export const faqs = [
+  {
+    q: "What is the minimum order quantity?",
+    a: "It depends on the line and the print method. Send your target quantity and we will confirm what is practical for that material before you commit to anything.",
+  },
+  {
+    q: "Can I get a sample before production?",
+    a: "Yes. A physical pre-production sample is standard on every order — you approve the material, print and stitching before the run starts.",
+  },
+  {
+    q: "Which artwork files do you accept?",
+    a: "JPG, PDF, AI or EPS. Send the vector file where you have one; we check colour separations and printability before quoting.",
+  },
+  {
+    q: "How long does production take?",
+    a: "It varies with quantity, print method and material stock. Once artwork is approved we confirm a production calendar with your order.",
+  },
+  {
+    q: "Do you ship FOB or CIF?",
+    a: "FOB Ningbo is our standard term. We can quote CIF, or work directly with the forwarder you already use.",
+  },
+  {
+    q: "Can you match a specific colour?",
+    a: "Yes — body, handles and lining are matched to a Pantone reference. Send the number with your enquiry.",
+  },
+];
+
+export const trustPoints = [
+  "In-house printing",
+  "Custom sizes & colours",
+  "Sample before production",
+  "FOB Ningbo · worldwide",
+];
+
+export const quotes = [
+  {
+    text: "The eco-bags from Maxgift are truly exceptional. The quality is outstanding, and I am proud to use them in my business. Their commitment to sustainability is unparalleled.",
+    name: "David Wilkins",
+    role: "Sustainability Manager, Greenleaf Enterprises",
+  },
+  {
+    text: "Maxgift's eco-bags have become an integral part of my daily routine. The durability and functionality make them a perfect choice for an eco-friendly lifestyle.",
+    name: "Julia Chen",
+    role: "Environmental Activist, Save Our Planet",
+  },
+  {
+    text: "The team has been extremely helpful and responsive throughout the entire purchasing experience. The bags blend style and sustainability.",
+    name: "Michael Rodriguez",
+    role: "General Manager, City Market Grocery",
+  },
+];

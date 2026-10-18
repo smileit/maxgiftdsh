@@ -1,43 +1,44 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { company, products } from "@/lib/catalog";
 
-type Status = "idle" | "error" | "sent";
+const empty = { name: "", brand: "", email: "", quantity: "", product: "", message: "" };
 
 export default function InquiryForm({ preset }: { preset?: string }) {
-  const [form, setForm] = useState({
-    name: "",
-    company: "",
-    email: "",
-    product: preset ?? "",
-    quantity: "",
-    message: "",
-  });
-  const [status, setStatus] = useState<Status>("idle");
+  const [form, setForm] = useState({ ...empty, product: preset ?? "" });
   const [error, setError] = useState("");
+  const [sent, setSent] = useState(false);
 
-  const set = (key: keyof typeof form) => (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
-    setForm((f) => ({ ...f, [key]: e.target.value }));
-    if (status === "error") setStatus("idle");
-  };
+  // Deep link from a product page: /contact?product=<slug>
+  useEffect(() => {
+    const slug = new URLSearchParams(window.location.search).get("product");
+    if (!slug) return;
+    const match = products.find((p) => p.slug === slug);
+    if (match) setForm((f) => ({ ...f, product: match.title }));
+  }, []);
 
-  function submit(e: React.FormEvent) {
+  const update =
+    (key: keyof typeof form) =>
+    (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
+      setForm((f) => ({ ...f, [key]: e.target.value }));
+      if (error) setError("");
+    };
+
+  const submit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!form.name.trim() || !form.email.trim()) {
-      setStatus("error");
       setError("Name and email are required.");
       return;
     }
     if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.email)) {
-      setStatus("error");
       setError("That email address doesn’t look right.");
       return;
     }
 
     const body = [
       `Name: ${form.name}`,
-      form.company && `Company: ${form.company}`,
+      form.brand && `Brand / company: ${form.brand}`,
       `Email: ${form.email}`,
       form.product && `Product line: ${form.product}`,
       form.quantity && `Quantity: ${form.quantity}`,
@@ -49,28 +50,27 @@ export default function InquiryForm({ preset }: { preset?: string }) {
 
     const subject = `Quote request${form.product ? ` — ${form.product}` : ""}`;
     window.location.href = `mailto:${company.email}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
-    setStatus("sent");
-  }
+    setSent(true);
+  };
 
-  if (status === "sent") {
+  if (sent) {
     return (
-      <div className="border border-line bg-cream/70 p-8 text-center sm:p-12">
-        <div className="mx-auto grid h-14 w-14 place-items-center rounded-full bg-moss/12 text-moss">
-          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6">
-            <path d="M5 13l4 4 10-10" strokeLinecap="round" strokeLinejoin="round" />
-          </svg>
-        </div>
-        <p className="display mt-6 text-3xl">Your email is ready to send.</p>
-        <p className="mx-auto mt-3 max-w-md text-sm leading-relaxed text-ink-soft">
-          We opened a draft in your mail app addressed to{" "}
-          <a href={`mailto:${company.email}`} className="text-ink underline">
-            {company.email}
-          </a>
-          . If nothing opened, copy your details to that address — or call {company.phone}.
+      <div className="form-success">
+        <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="#e0b07a" strokeWidth="1.5">
+          <path d="M5 13l4 4L19 7" strokeLinecap="round" strokeLinejoin="round" />
+        </svg>
+        <h3>Your email is ready to send.</h3>
+        <p>
+          We opened a draft addressed to {company.email}. If nothing opened, copy your details to
+          that address — or call {company.phone}.
         </p>
         <button
-          onClick={() => setStatus("idle")}
-          className="mt-7 rounded-full border border-ink/20 px-6 py-3 text-[11px] tracking-[0.18em] uppercase transition hover:border-ink"
+          className="btn btn--ghost-light btn--sm"
+          style={{ marginTop: 22 }}
+          onClick={() => {
+            setForm(empty);
+            setSent(false);
+          }}
         >
           Send another
         </button>
@@ -79,47 +79,46 @@ export default function InquiryForm({ preset }: { preset?: string }) {
   }
 
   return (
-    <form onSubmit={submit} className="space-y-6">
-      <div className="grid gap-6 sm:grid-cols-2">
-        <Field label="Your name" required>
+    <form onSubmit={submit} noValidate>
+      <div className="form-grid">
+        <label className="field">
+          <span className="field__label">
+            Your name <i>*</i>
+          </span>
+          <input value={form.name} onChange={update("name")} placeholder="Jane Doe" autoComplete="name" />
+        </label>
+
+        <label className="field">
+          <span className="field__label">Brand / company</span>
           <input
-            value={form.name}
-            onChange={set("name")}
-            placeholder="Jane Doe"
-            className="w-full border-b border-line bg-transparent py-3 text-sm focus:border-ink focus:outline-none"
-          />
-        </Field>
-        <Field label="Company">
-          <input
-            value={form.company}
-            onChange={set("company")}
+            value={form.brand}
+            onChange={update("brand")}
             placeholder="Acme Retail"
-            className="w-full border-b border-line bg-transparent py-3 text-sm focus:border-ink focus:outline-none"
+            autoComplete="organization"
           />
-        </Field>
-        <Field label="Email" required>
+        </label>
+
+        <label className="field">
+          <span className="field__label">
+            Email <i>*</i>
+          </span>
           <input
             type="email"
             value={form.email}
-            onChange={set("email")}
+            onChange={update("email")}
             placeholder="you@company.com"
-            className="w-full border-b border-line bg-transparent py-3 text-sm focus:border-ink focus:outline-none"
+            autoComplete="email"
           />
-        </Field>
-        <Field label="Quantity">
-          <input
-            value={form.quantity}
-            onChange={set("quantity")}
-            placeholder="e.g. 5,000 pcs"
-            className="w-full border-b border-line bg-transparent py-3 text-sm focus:border-ink focus:outline-none"
-          />
-        </Field>
-        <Field label="Product line" className="sm:col-span-2">
-          <select
-            value={form.product}
-            onChange={set("product")}
-            className="w-full border-b border-line bg-transparent py-3 text-sm focus:border-ink focus:outline-none"
-          >
+        </label>
+
+        <label className="field">
+          <span className="field__label">Quantity</span>
+          <input value={form.quantity} onChange={update("quantity")} placeholder="e.g. 5,000 pcs" />
+        </label>
+
+        <label className="field span-2">
+          <span className="field__label">Product line</span>
+          <select value={form.product} onChange={update("product")}>
             <option value="">Not sure yet — advise me</option>
             {products.map((p) => (
               <option key={p.slug} value={p.title}>
@@ -127,65 +126,26 @@ export default function InquiryForm({ preset }: { preset?: string }) {
               </option>
             ))}
           </select>
-        </Field>
-        <Field label="What are you packing?" className="sm:col-span-2">
+        </label>
+
+        <label className="field span-2">
+          <span className="field__label">What are you packing?</span>
           <textarea
             value={form.message}
-            onChange={set("message")}
-            rows={4}
+            onChange={update("message")}
             placeholder="Size, colour, print colours, delivery country, deadline…"
-            className="w-full resize-none border-b border-line bg-transparent py-3 text-sm focus:border-ink focus:outline-none"
+            rows={3}
           />
-        </Field>
+        </label>
       </div>
 
-      {status === "error" ? (
-        <p className="text-[12px] text-[#a4361f]">{error}</p>
-      ) : (
-        <p className="text-[11px] leading-relaxed text-ink-soft">
-          We reply within one working day. Artwork can follow by email — JPG, PDF, AI or EPS.
-        </p>
-      )}
+      <p className={`form-note ${error ? "form-note--error" : ""}`}>
+        {error || "We reply within one working day. Artwork can follow by email — JPG, PDF, AI or EPS."}
+      </p>
 
-      <button
-        type="submit"
-        className="group inline-flex w-full items-center justify-center gap-3 rounded-full bg-ink py-4 text-[11px] tracking-[0.18em] uppercase text-cream transition hover:bg-moss sm:w-auto sm:px-10"
-      >
+      <button type="submit" className="btn btn--ghost-light" style={{ width: "100%", maxWidth: 260 }}>
         Send enquiry
-        <svg
-          width="14"
-          height="14"
-          viewBox="0 0 16 16"
-          fill="none"
-          stroke="currentColor"
-          strokeWidth="1.4"
-          className="transition-transform duration-500 group-hover:translate-x-1"
-        >
-          <path d="M2 8h11M9 4l4 4-4 4" strokeLinecap="round" strokeLinejoin="round" />
-        </svg>
       </button>
     </form>
-  );
-}
-
-function Field({
-  label,
-  required,
-  className = "",
-  children,
-}: {
-  label: string;
-  required?: boolean;
-  className?: string;
-  children: React.ReactNode;
-}) {
-  return (
-    <label className={`block ${className}`}>
-      <span className="mb-1 flex items-center gap-1 text-[10px] tracking-[0.16em] uppercase text-ink-soft">
-        {label}
-        {required ? <span className="text-kraft">*</span> : null}
-      </span>
-      {children}
-    </label>
   );
 }

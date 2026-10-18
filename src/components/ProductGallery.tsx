@@ -8,29 +8,27 @@ export default function ProductGallery({ images, alt }: { images: string[]; alt:
 
   return (
     <div>
-      <div className="relative aspect-square overflow-hidden bg-sand">
+      <div className="gallery__main">
         <Image
           key={images[active]}
           src={images[active]}
           alt={alt}
           fill
           priority
-          sizes="(max-width: 1024px) 100vw, 50vw"
+          sizes="(max-width: 1024px) 100vw, 52vw"
           className="object-cover"
         />
       </div>
 
       {images.length > 1 ? (
-        <div className="mt-3 grid grid-cols-6 gap-2">
+        <div className="gallery__thumbs">
           {images.map((src, i) => (
             <button
               key={src}
+              data-active={active === i}
               onClick={() => setActive(i)}
               aria-label={`View image ${i + 1}`}
               aria-pressed={active === i}
-              className={`relative aspect-square overflow-hidden border transition ${
-                active === i ? "border-ink" : "border-transparent hover:border-line"
-              }`}
             >
               <Image src={src} alt="" fill sizes="10vw" className="object-cover" />
             </button>
