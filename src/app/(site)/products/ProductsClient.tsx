@@ -2,14 +2,15 @@
 
 import { useEffect, useMemo, useState } from "react";
 import type { Family } from "@/lib/catalog";
-import { families, products } from "@/lib/catalog";
+import { families } from "@/lib/catalog";
+import type { ProductRow } from "@/lib/db";
 import ProductCard from "@/components/ProductCard";
 import Reveal from "@/components/Reveal";
 
-export default function ProductsClient() {
+export default function ProductsClient({ products }: { products: ProductRow[] }) {
   const [family, setFamily] = useState<Family | "all">("all");
 
-  // Read ?family= on the client so the route stays fully static.
+  // Read ?family= on the client; the page itself is rendered on the server.
   useEffect(() => {
     const value = new URLSearchParams(window.location.search).get("family");
     if (value && families.some((f) => f.id === value)) setFamily(value as Family);
@@ -17,7 +18,7 @@ export default function ProductsClient() {
 
   const list = useMemo(
     () => (family === "all" ? products : products.filter((p) => p.family === family)),
-    [family],
+    [family, products],
   );
 
   return (
@@ -30,8 +31,8 @@ export default function ProductsClient() {
               All product lines
             </h1>
             <p>
-              Eight lines, each made to your size, colour and artwork. The specs below are the
-              standard build — change anything.
+              Every line is made to your size, colour and artwork. The specs below are the standard
+              build — change anything.
             </p>
           </div>
           <p className="eyebrow eyebrow--plain">

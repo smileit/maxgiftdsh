@@ -29,7 +29,7 @@ export type Product = {
   featured?: boolean;
 };
 
-export const products: Product[] = [
+export const seedProducts: Product[] = [
   {
     slug: "non-woven-bag",
     title: "Non Woven Bag",
@@ -255,10 +255,6 @@ export const products: Product[] = [
     featured: true,
   },
 ];
-
-export function getProduct(slug: string) {
-  return products.find((p) => p.slug === slug);
-}
 
 export function familyName(id: Family) {
   return families.find((f) => f.id === id)?.name ?? "";

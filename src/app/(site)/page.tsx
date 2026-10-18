@@ -1,4 +1,5 @@
 import Image from "next/image";
+import { connection } from "next/server";
 import Link from "next/link";
 import ProductCard from "@/components/ProductCard";
 import Reveal from "@/components/Reveal";
@@ -8,10 +9,10 @@ import {
   families,
   faqs,
   processSteps,
-  products,
   quotes,
   trustPoints,
 } from "@/lib/catalog";
+import { listProducts } from "@/lib/db";
 import InquiryForm from "@/components/InquiryForm";
 
 const familyCovers: Record<string, string> = {
@@ -45,7 +46,9 @@ const capabilities = [
   },
 ];
 
-export default function Home() {
+export default async function Home() {
+  await connection();
+  const products = listProducts();
   const hero = products.find((p) => p.slug === "non-woven-bag") ?? products[0];
 
   return (
@@ -408,7 +411,7 @@ export default function Home() {
               </div>
             </div>
 
-            <InquiryForm />
+            <InquiryForm products={products.map((p) => ({ slug: p.slug, title: p.title, code: p.code }))} />
           </div>
         </div>
       </section>

@@ -1,10 +1,14 @@
 import Link from "next/link";
-import { company, families, products } from "@/lib/catalog";
+import { connection } from "next/server";
+import { company, families } from "@/lib/catalog";
+import { listProducts } from "@/lib/db";
 
 // Evaluated once per build rather than during render (Next's unstable-value rule).
 const YEAR = new Date().getFullYear();
 
-export default function Footer() {
+export default async function Footer() {
+  await connection();
+  const products = listProducts();
   return (
     <footer className="footer">
       <div className="shell">
@@ -74,10 +78,10 @@ export default function Footer() {
 
         <div className="footer__bottom">
           <p style={{ margin: 0 }}>
-            © {YEAR} {company.name}. All rights reserved.
+            漏 {YEAR} {company.name}. All rights reserved.
           </p>
           <p style={{ margin: 0, letterSpacing: "0.12em", textTransform: "uppercase" }}>
-            {company.port} · Worldwide shipping
+            {company.port} 路 Worldwide shipping
           </p>
         </div>
       </div>

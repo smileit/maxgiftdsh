@@ -1,7 +1,11 @@
 import type { Metadata } from "next";
+
+export const instant = false;
 import Image from "next/image";
 import InquiryForm from "@/components/InquiryForm";
+import { connection } from "next/server";
 import { company } from "@/lib/catalog";
+import { listProducts } from "@/lib/db";
 
 export const metadata: Metadata = {
   title: "Request a quote",
@@ -9,7 +13,9 @@ export const metadata: Metadata = {
     "Send your product, quantity and artwork. Maxgift Pro replies within one working day with material advice, unit price and a sample timeline.",
 };
 
-export default function ContactPage() {
+export default async function ContactPage() {
+  await connection();
+  const products = listProducts().map((p) => ({ slug: p.slug, title: p.title, code: p.code }));
   return (
     <section className="band" style={{ paddingTop: 56 }}>
       <div className="shell">
@@ -94,7 +100,7 @@ export default function ContactPage() {
             >
               Enquiry form
             </p>
-            <InquiryForm />
+            <InquiryForm products={products} />
           </div>
         </div>
       </div>

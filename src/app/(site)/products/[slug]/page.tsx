@@ -1,18 +1,19 @@
 import type { Metadata } from "next";
+
+export const instant = false;
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import { connection } from "next/server";
 import ProductCard from "@/components/ProductCard";
 import ProductGallery from "@/components/ProductGallery";
 import Reveal from "@/components/Reveal";
-import { company, customisation, familyName, getProduct, products } from "@/lib/catalog";
-
-export function generateStaticParams() {
-  return products.map((p) => ({ slug: p.slug }));
-}
+import { company, customisation, familyName } from "@/lib/catalog";
+import { getProductBySlug, listProducts } from "@/lib/db";
 
 export async function generateMetadata(props: PageProps<"/products/[slug]">): Promise<Metadata> {
+  await connection();
   const { slug } = await props.params;
-  const product = getProduct(slug);
+  const product = getProductBySlug(slug);
   if (!product) return { title: "Product not found" };
   return {
     title: product.title,
@@ -22,10 +23,12 @@ export async function generateMetadata(props: PageProps<"/products/[slug]">): Pr
 }
 
 export default async function ProductPage(props: PageProps<"/products/[slug]">) {
+  await connection();
   const { slug } = await props.params;
-  const product = getProduct(slug);
-  if (!product) notFound();
+  const product = getProductBySlug(slug);
+  if (!product || !product.published) notFound();
 
+  const products = listProducts();
   const same = products.filter((p) => p.slug !== product.slug && p.family === product.family);
   const rest = products.filter((p) => p.slug !== product.slug);
   const related = (same.length >= 2 ? same : rest).slice(0, 4);

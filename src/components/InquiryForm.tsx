@@ -1,11 +1,19 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { company, products } from "@/lib/catalog";
+import { company } from "@/lib/catalog";
 
 const empty = { name: "", brand: "", email: "", quantity: "", product: "", message: "" };
 
-export default function InquiryForm({ preset }: { preset?: string }) {
+type ProductOption = { slug: string; title: string; code: string };
+
+export default function InquiryForm({
+  preset,
+  products = [],
+}: {
+  preset?: string;
+  products?: ProductOption[];
+}) {
   const [form, setForm] = useState({ ...empty, product: preset ?? "" });
   const [error, setError] = useState("");
   const [sent, setSent] = useState(false);
